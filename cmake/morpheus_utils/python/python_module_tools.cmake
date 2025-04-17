@@ -368,7 +368,7 @@ function(morpheus_utils_build_python_package PACKAGE_NAME)
 
   # Change which setup we use if we are using inplace
   if(_ARGS_IS_INPLACE)
-    list(APPEND _pip_command "-e")
+    # list(APPEND _pip_command "-e")
     list(APPEND _pip_command "${sources_source_dir}")
   else()
     list(APPEND _pip_command "${sources_binary_dir}")
@@ -623,10 +623,11 @@ macro(__create_python_library MODULE_NAME)
     # Before installing, create the custom command to generate the stubs
     add_custom_command(
       OUTPUT  ${module_binary_stub_file}
-      COMMAND ${Python3_EXECUTABLE} -m pybind11_stubgen ${TARGET_NAME} --no-setup-py --log-level WARN -o ./ --root-module-suffix \"\"
+      COMMAND env PYTHONPATH=${module_root_binary_dir}:$PYTHONPATH ${Python3_EXECUTABLE} -m pybind11_stubgen ${TARGET_NAME} --no-setup-py --log-level WARN -o ./ --root-module-suffix ""
       DEPENDS ${PYTHON_ACTIVE_PACKAGE_NAME}-modules $<TARGET_OBJECTS:${TARGET_NAME}>
       COMMENT "Building stub for python module ${TARGET_NAME}..."
       WORKING_DIRECTORY ${module_root_binary_dir}
+      VERBATIM
     )
 
     # Add a custom target to ensure the stub generation runs
